@@ -3,10 +3,12 @@ import asyncHandler from "../utils/asyncHandler.js"
 import jwt from "jsonwebtoken"
 import { User } from "../models/user.model.js"
   
-export const verifyJWT= asyncHandler(async(req,res,next)=>{
+export const verifyJWT= asyncHandler(async(req,_,next)=>{
    try {
-    const token= req.cookie?.accesToken||req.header("Authorization")?.replace("Bearer ","") 
+    const token= req.cookies?.accesToken||req.header("Authorization")?.replace("Bearer ","") 
+    console.log(token)
     if (!token) {
+      
      throw new apiErrors(401,"Authentication failed")
     } 
  
@@ -16,7 +18,7 @@ export const verifyJWT= asyncHandler(async(req,res,next)=>{
         throw new apiErrors(401,"Invaild accesToken")
      }
  
-     const user =await User.findById(...decodeToken,_id).select("-password -refreshToken")
+     const user =await User.findById(decodeToken?._id).select("-password -refreshToken")
 
      if (!user) {
       throw new apiErrors(401,"Invaild acces token")
@@ -26,7 +28,8 @@ export const verifyJWT= asyncHandler(async(req,res,next)=>{
  
      next()
    } catch (error) {
-     throw new apiErrors(401,"Invalid acces token")
+    console.log(error)
+     throw new apiErrors(401,"Invalid last accestoken",error)
    }
 
     
