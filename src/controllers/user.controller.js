@@ -156,8 +156,8 @@ const logOut = asyncHandler(async (req, res) => {
    await User.findByIdAndUpdate(
       req.user._id,
       {
-         $set: {
-            refreshToken: undefined
+         $unset: {
+            refreshToken: 1
          }
       },
       {
@@ -340,7 +340,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
    }
 
 
-   const channel= await User.aggregate([
+   const channel = await User.aggregate([
       {
          $match: {
             username: username?.toLowerCase(),
@@ -401,60 +401,62 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
    ])
 
    if (!channel?.length) {
-      throw new apiErrors(401,"channel does not exists")
+      throw new apiErrors(401, "channel does not exists")
    }
 
    return res
-   .status(200)
-   .json(new apiResponse(200,channel[0],"User channel fetched succesfully"))
+      .status(200)
+      .json(new apiResponse(200, channel[0], "User channel fetched succesfully"))
 
 })
 
-const getWatchHistory=asyncHandler(async(req,res)=>{
-   const user =await User.aggregate([{
-      $match:{
+const getWatchHistory = asyncHandler(async (req, res) => {
+   const user = await User.aggregate([{
+      $match: {
          _id: new mongoose.Types.ObjectId
       }
-      
+
    },
-   { $lookup:{
-      from:"videos",
-      foreignField:"watchHistory",
-      localField:"_id",
-      as:"watchHistory",
-      pipeline:[{
-         $lookup:{
-            from:"users",
-            foreignField:"_id",
-            localField:"owner",
-            as:"owner",
-            pipeline:[{
-               $project:{
-                  fullname:1,
-                  username:1,
-                  avatar:1
-               }
-            }]
-         }
-      },
-       {
-          $addFields:{
-            owner:{
-            $first:"$owner"
+   {
+         $lookup: {
+         from: "videos",
+         foreignField: "watchHistory",
+         localField: "_id",
+         as: "watchHistory",
+         pipeline: [{
+             $lookup: {
+               from: "users",
+               foreignField: "_id",
+               localField: "owner",
+               as: "owner",
+               pipeline: [{
+                  $project: {
+                     fullname: 1,
+                     username: 1,
+                     avatar: 1
+                  }
+               }]
             }
-          }
-       }
-                ]
+         },
+         {
+            $addFields: {
+               owner: {
+                  $first: "$owner"
+               }
+            }
+         }
+         ]
+
+      }
 
    }
-
-   }
-]),
+   ])
 
 
-return res
-.status(200)
-.json(new apiResponse(200,user[0].watchHistory,"Watch History Successfully"))
+  return res
+  .status(200)
+      .json(new apiResponse(200, user[0].watchHistory, "Watch History Successfully"))
+      
 
 })
 

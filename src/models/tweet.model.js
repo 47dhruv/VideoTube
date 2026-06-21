@@ -1,0 +1,17 @@
+import mongoose ,{Schema} from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
+const tweetSchema = new Schema({
+    owner:{
+     type:Schema.Types.ObjectId,
+     ref:"User",
+     },
+     content:{
+        type:String,
+        require:true,
+        
+     }
+
+
+},{timestamps:true})
+tweetSchema.plugin(mongooseAggregatePaginate)
+export default Tweet=mongoose.model("Tweet",tweetSchema)
