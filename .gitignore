@@ -1,6 +1,6 @@
 # Dependencies
 node_modules/
-
+practice.js
 # Environment variables
 .env
 .env.local
