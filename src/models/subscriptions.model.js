@@ -10,7 +10,7 @@ const subscriptionSchema= new Schema({
         lowercase:true
 
     },
-    suscriber:{
+    subscriber:{
          type:Schema.Types.ObjectId,//one who is subscribing
         ref:"User",
         required:true,
@@ -22,4 +22,4 @@ const subscriptionSchema= new Schema({
 
 },{timestamps:true})
 
- export  default Subscription = mongoose.model("Subscription",subscriptionSchema)
+ export const Subscription = mongoose.model("Subscription",subscriptionSchema)
